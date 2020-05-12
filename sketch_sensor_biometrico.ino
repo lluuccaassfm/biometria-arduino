@@ -7,6 +7,7 @@ SoftwareSerial sensor(2, 3);        //variavel do sensor/portas de dados do sens
 Servo servo;                        //variavel do servor
 int botao = 7;
 int botao_pressionado = 0;
+boolean admin = false;
 
 uint8_t modoGravacaoID(uint8_t IDgravar); //declara a funcao de modogravacao
 
@@ -30,6 +31,7 @@ void setup() {
 }
 
 void loop() {
+   verificaPessoa();
   botao_pressionado = digitalRead(botao);
   if(botao_pressionado == HIGH){                        //verifica se o botao foi pressionado
     Serial.println("Aguardando id do Administrador!"); 
@@ -39,6 +41,26 @@ void loop() {
   } else {
     
   }
+}
+
+int verificaPessoa() {
+uint8_t p = finger.getImage();
+  if (p != FINGERPRINT_OK)  return -1;
+
+  p = finger.image2Tz();
+  if (p != FINGERPRINT_OK)  return -1;
+
+  p = finger.fingerFastSearch();
+  if (p != FINGERPRINT_OK)  return -1;
+
+  if(finger.fingerID == 0){
+    admin = true;
+    Serial.print("ola admin")
+  }
+
+  Serial.print("Você esta castrado no sistema");
+  Serial.print("Found ID #"); Serial.print(finger.fingerID); 
+  Serial.print(" with confidence of "); Serial.println(finger.confidence);
 }
 
 uint8_t modoGravacaoID(uint8_t IDgravar) {
