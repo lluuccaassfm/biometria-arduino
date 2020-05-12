@@ -8,6 +8,7 @@ Servo servo;                        //variavel do servor
 int botao = 7;
 int botao_pressionado = 0;
 boolean admin = false;
+int pessoas =1; //numero de pessoas/digitais. Numero 0 reservado para o adminitrador. incremental
 
 uint8_t modoGravacaoID(uint8_t IDgravar); //declara a funcao de modogravacao
 
@@ -31,36 +32,37 @@ void setup() {
 }
 
 void loop() {
-   verificaPessoa();
+  
+   verificaPessoa(); //Método que verifica se a digital esta na memoria e se pertence a um administrador
+   
   botao_pressionado = digitalRead(botao);
   if(botao_pressionado == HIGH){                        //verifica se o botao foi pressionado
     Serial.println("Aguardando id do Administrador!"); 
     botao_pressionado = LOW;                            //delay para nao ficar repetindo a mensagem
     delay(2000);
-    modoGravacaoID(1);
+    modoGravacaoID(pessoas);
   } else {
     
   }
 }
 
-int verificaPessoa() {
-uint8_t p = finger.getImage();
-  if (p != FINGERPRINT_OK)  return -1;
+void verificaPessoa() {
+uint8_t p = dedo.getImage();
+  switch(p){
+    case FINGERPRINT_OK:
+        if(dedo.fingerID == 0){ // Comparando digital colocada com a digital da memoria, A digital 0 resenvada para o administrador  
+          admin = true; //Esta digital percente ao administrador
+          Serial.println("ola admin.");
+        }
 
-  p = finger.image2Tz();
-  if (p != FINGERPRINT_OK)  return -1;
-
-  p = finger.fingerFastSearch();
-  if (p != FINGERPRINT_OK)  return -1;
-
-  if(finger.fingerID == 0){
-    admin = true;
-    Serial.print("ola admin")
+          Serial.println("Você esta castrado no sistema.");
+          Serial.print("Found ID #"); Serial.print(dedo.fingerID); 
+          Serial.print(" with confidence of "); Serial.println(dedo.confidence);
+      break;
+    case FINGERPRINT_PACKETRECIEVEERR:
+      Serial.println("Erro comunicação");
+      break;
   }
-
-  Serial.print("Você esta castrado no sistema");
-  Serial.print("Found ID #"); Serial.print(finger.fingerID); 
-  Serial.print(" with confidence of "); Serial.println(finger.confidence);
 }
 
 uint8_t modoGravacaoID(uint8_t IDgravar) {
@@ -190,6 +192,7 @@ uint8_t modoGravacaoID(uint8_t IDgravar) {
   p = dedo.storeModel(IDgravar);
   if (p == FINGERPRINT_OK) {
     Serial.println("Armazenado!");
+    pessoas++; //adiciona mais 1 no contador para armazenar proxima pessoa/digital
   } else if (p == FINGERPRINT_PACKETRECIEVEERR) {
     Serial.println("Erro de comunicação");
     return p;
