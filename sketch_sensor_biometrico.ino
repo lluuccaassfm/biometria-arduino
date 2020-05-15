@@ -2,6 +2,7 @@
 #include <Adafruit_Fingerprint.h> //biblioteca do sensor
 #include <Servo.h>                //biblioteca do servo
 
+
 LiquidCrystal lcd(4,5,10,11,12,13); //variavel do lcd/portas de dados do lcd
 SoftwareSerial sensor(2, 3);        //variavel do sensor/portas de dados do sensor
 Servo servo;                        //variavel do servor
@@ -34,7 +35,7 @@ void setup() {
 void loop() {
   
    verificaPessoa(); //Método que verifica se a digital esta na memoria e se pertence a um administrador
-   
+   delay(50);
   botao_pressionado = digitalRead(botao);
   if(botao_pressionado == HIGH){                        //verifica se o botao foi pressionado
     Serial.println("Aguardando id do Administrador!"); 
@@ -46,23 +47,25 @@ void loop() {
   }
 }
 
-void verificaPessoa() {
-uint8_t p = dedo.getImage();
-  switch(p){
-    case FINGERPRINT_OK:
-        if(dedo.fingerID == 0){ // Comparando digital colocada com a digital da memoria, A digital 0 resenvada para o administrador  
-          admin = true; //Esta digital percente ao administrador
-          Serial.println("ola admin.");
-        }
+int verificaPessoa() {
+  uint8_t p = dedo.getImage();
+  if (p != FINGERPRINT_OK)  return -1;
 
-          Serial.println("Você esta castrado no sistema.");
-          Serial.print("Found ID #"); Serial.print(dedo.fingerID); 
-          Serial.print(" with confidence of "); Serial.println(dedo.confidence);
-      break;
-    case FINGERPRINT_PACKETRECIEVEERR:
-      Serial.println("Erro comunicação");
-      break;
+  p = dedo.image2Tz();
+  if (p != FINGERPRINT_OK)  return -1;
+
+  p = dedo.fingerFastSearch();
+  if (p != FINGERPRINT_OK)  return -1;
+  
+
+  if(dedo.fingerID == 0){  // Comparando digital colocada com a digital da memoria, A digital 0 resenvada para o administrador 
+    Serial.print("tu e o admin");
+    admin = true; //Esta digital percente ao administrador
   }
+
+  Serial.print("Found ID #"); Serial.print(dedo.fingerID); 
+  Serial.print(" with confidence of "); Serial.println(dedo.confidence);
+  return dedo.fingerID; 
 }
 
 uint8_t modoGravacaoID(uint8_t IDgravar) {
