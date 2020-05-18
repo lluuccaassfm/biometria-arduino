@@ -1,6 +1,7 @@
 #include <LiquidCrystal.h>        //biblioteca do lcd
 #include <Adafruit_Fingerprint.h> //biblioteca do sensor
 #include <Servo.h>                //biblioteca do servo
+#include <Thread.h>               //biblioteca de Thread
 
 
 LiquidCrystal lcd(4,5,10,11,12,13); //variavel do lcd/portas de dados do lcd
@@ -12,6 +13,9 @@ boolean admin = false;
 int pessoas =1; //numero de pessoas/digitais. Numero 0 reservado para o adminitrador. incremental
 
 uint8_t modoGravacaoID(uint8_t IDgravar); //declara a funcao de modogravacao
+
+
+Thread Thread1 = new Thread(); //Declaracao da Thread1 para executar verificacao de usuario e adiciona nova digital 
 
 Adafruit_Fingerprint dedo = Adafruit_Fingerprint(&sensor);
 void setup() {
@@ -30,11 +34,22 @@ void setup() {
       delay(1); 
       }
   }
+
+  Thread1->onRun(threadDigital); 
+	Thread1->setInterval(1000); //Executa o processo threadDigital no intervalo de 1s
+
 }
 
 void loop() {
-  
-   verificaPessoa(); //Método que verifica se a digital esta na memoria e se pertence a um administrador
+
+  if(Thread1.shouldRun()) Thread1.run(); //Verifica se o Thread1 deve ser executado;
+
+}
+
+
+void  threadDigital(){ //Metodo sendo executado na Thread1
+
+  verificaPessoa(); //Método que verifica se a digital esta na memoria e se pertence a um administrador
    delay(50);
   botao_pressionado = digitalRead(botao);
   if(botao_pressionado == HIGH){                        //verifica se o botao foi pressionado
@@ -45,6 +60,7 @@ void loop() {
   } else {
     
   }
+
 }
 
 int verificaPessoa() {
@@ -59,7 +75,7 @@ int verificaPessoa() {
   
 
   if(dedo.fingerID == 0){  // Comparando digital colocada com a digital da memoria, A digital 0 resenvada para o administrador 
-    Serial.print("tu e o admin");
+    Serial.println("Ola Administrador");
     admin = true; //Esta digital percente ao administrador
   }
 
