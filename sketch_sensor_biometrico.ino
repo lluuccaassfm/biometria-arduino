@@ -14,8 +14,8 @@ int pessoas =1; //numero de pessoas/digitais. Numero 0 reservado para o adminitr
 
 uint8_t modoGravacaoID(uint8_t IDgravar); //declara a funcao de modogravacao
 
-
-Thread Thread1 = new Thread(); //Declaracao da Thread1 para executar verificacao de usuario e adiciona nova digital 
+Thread Thread1 = Thread(); //Declaracao da Thread1 para executar verificacao de usuario e adiciona nova digital 
+Thread ThreadVerificaPessoa = Thread();
 
 Adafruit_Fingerprint dedo = Adafruit_Fingerprint(&sensor);
 void setup() {
@@ -34,22 +34,24 @@ void setup() {
       delay(1); 
       }
   }
+  
+  Thread1.onRun(threadDigital); 
+	Thread1.setInterval(1000); //Executa o processo threadDigital no intervalo de 1s
 
-  Thread1->onRun(threadDigital); 
-	Thread1->setInterval(1000); //Executa o processo threadDigital no intervalo de 1s
-
+  ThreadVerificaPessoa.onRun(verificaPessoa);
+  ThreadVerificaPessoa.setInterval(50);
 }
 
 void loop() {
 
   if(Thread1.shouldRun()) Thread1.run(); //Verifica se o Thread1 deve ser executado;
-
+  if(ThreadVerificaPessoa.shouldRun()) ThreadVerificaPessoa.run(); 
 }
 
 
 void  threadDigital(){ //Metodo sendo executado na Thread1
 
-  verificaPessoa(); //Método que verifica se a digital esta na memoria e se pertence a um administrador
+  //verificaPessoa(); //Método que verifica se a digital esta na memoria e se pertence a um administrador
    delay(50);
   botao_pressionado = digitalRead(botao);
   if(botao_pressionado == HIGH){                        //verifica se o botao foi pressionado
