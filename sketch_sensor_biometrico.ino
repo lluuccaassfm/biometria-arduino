@@ -22,6 +22,8 @@ void setup() {
   pinMode(botao,INPUT);
   lcd.begin(16,2);    //o lcd tem duas filas e 16 colunas
   servo.attach(8);  //porta de dados do servo motor
+  pinLedGreen(10, OUTPUT); //led verde
+  pinLedRed(14, OUTPUT); //led vermelho
   
   Serial.begin(9600);
   dedo.begin(57600);
@@ -52,7 +54,7 @@ void loop() {
 void  threadDigital(){ //Metodo sendo executado na Thread1
 
   //verificaPessoa(); //Método que verifica se a digital esta na memoria e se pertence a um administrador
-   delay(50);
+  delay(50);
   botao_pressionado = digitalRead(botao);
   if(botao_pressionado == HIGH){                        //verifica se o botao foi pressionado
     Serial.println("Aguardando id do Administrador!"); 
@@ -73,16 +75,34 @@ int verificaPessoa() {
   if (p != FINGERPRINT_OK)  return -1;
 
   p = dedo.fingerFastSearch();
-  if (p != FINGERPRINT_OK)  return -1;
-  
+  if (p != FINGERPRINT_OK){
+    return digitalFailed();
+  }  
 
   if(dedo.fingerID == 0){  // Comparando digital colocada com a digital da memoria, A digital 0 resenvada para o administrador 
     Serial.println("Ola Administrador");
     admin = true; //Esta digital percente ao administrador
   }
 
+   return digitalSucess();  
+}
+
+int digitalFailed(){
+  Serial.print("Digital não encontrada!");
+  digitalWrite(14, HIGH);
+  delay(1000);
+  digitalWrite(14, LOW);
+  return -1;
+}
+
+int digitalSucess(){
+  servo.angulo(80);
+  digitalWrite(10, HIGH);
+  delay(1000);
+  digitalWrite(10, LOW);
   Serial.print("Found ID #"); Serial.print(dedo.fingerID); 
   Serial.print(" with confidence of "); Serial.println(dedo.confidence);
+
   return dedo.fingerID; 
 }
 
