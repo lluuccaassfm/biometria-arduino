@@ -11,6 +11,8 @@ int botao = 7;
 int botao_pressionado = 0;
 boolean admin = false;
 int pessoas =1; //numero de pessoas/digitais. Numero 0 reservado para o adminitrador. incremental
+int pinLedGreen = 9;
+int pinLedRed = 8;
 
 uint8_t modoGravacaoID(uint8_t IDgravar); //declara a funcao de modogravacao
 
@@ -21,7 +23,9 @@ Adafruit_Fingerprint dedo = Adafruit_Fingerprint(&sensor);
 void setup() {
   pinMode(botao,INPUT);
   lcd.begin(16,2);    //o lcd tem duas filas e 16 colunas
-  servo.attach(8);  //porta de dados do servo motor
+  servo.attach(6);  //porta de dados do sservo motor
+  pinMode(pinLedGreen, OUTPUT); //led verde
+  pinMode(pinLedRed, OUTPUT); //led vermelho
   
   Serial.begin(9600);
   dedo.begin(57600);
@@ -52,7 +56,7 @@ void loop() {
 void  threadDigital(){ //Metodo sendo executado na Thread1
 
   //verificaPessoa(); //Método que verifica se a digital esta na memoria e se pertence a um administrador
-   delay(50);
+  delay(50);
   botao_pressionado = digitalRead(botao);
   if(botao_pressionado == HIGH){                        //verifica se o botao foi pressionado
     Serial.println("Aguardando id do Administrador!"); 
@@ -73,16 +77,34 @@ int verificaPessoa() {
   if (p != FINGERPRINT_OK)  return -1;
 
   p = dedo.fingerFastSearch();
-  if (p != FINGERPRINT_OK)  return -1;
-  
+  if (p != FINGERPRINT_OK){
+    return digitalFailed();
+  }  
 
   if(dedo.fingerID == 0){  // Comparando digital colocada com a digital da memoria, A digital 0 resenvada para o administrador 
     Serial.println("Ola Administrador");
     admin = true; //Esta digital percente ao administrador
   }
 
+   return digitalSucess();  
+}
+
+int digitalFailed(){
+  Serial.print("Digital não encontrada!");
+  digitalWrite(pinLedRed, HIGH);
+  delay(1000);
+  digitalWrite(pinLedRed, LOW);
+  return -1;
+}
+
+int digitalSucess(){
+  servo.write(80);
+  digitalWrite(pinLedGreen, HIGH);
+  delay(1000);
+  digitalWrite(pinLedGreen, LOW);
   Serial.print("Found ID #"); Serial.print(dedo.fingerID); 
   Serial.print(" with confidence of "); Serial.println(dedo.confidence);
+
   return dedo.fingerID; 
 }
 
