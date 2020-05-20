@@ -11,6 +11,8 @@ int botao = 7;
 int botao_pressionado = 0;
 boolean admin = false;
 int pessoas =1; //numero de pessoas/digitais. Numero 0 reservado para o adminitrador. incremental
+int pinLedGreen = 9;
+int pinLedRed = 8;
 
 uint8_t modoGravacaoID(uint8_t IDgravar); //declara a funcao de modogravacao
 
@@ -21,9 +23,9 @@ Adafruit_Fingerprint dedo = Adafruit_Fingerprint(&sensor);
 void setup() {
   pinMode(botao,INPUT);
   lcd.begin(16,2);    //o lcd tem duas filas e 16 colunas
-  servo.attach(8);  //porta de dados do servo motor
-  pinLedGreen(10, OUTPUT); //led verde
-  pinLedRed(14, OUTPUT); //led vermelho
+  servo.attach(6);  //porta de dados do sservo motor
+  pinMode(pinLedGreen, OUTPUT); //led verde
+  pinMode(pinLedRed, OUTPUT); //led vermelho
   
   Serial.begin(9600);
   dedo.begin(57600);
@@ -89,17 +91,17 @@ int verificaPessoa() {
 
 int digitalFailed(){
   Serial.print("Digital não encontrada!");
-  digitalWrite(14, HIGH);
+  digitalWrite(pinLedRed, HIGH);
   delay(1000);
-  digitalWrite(14, LOW);
+  digitalWrite(pinLedRed, LOW);
   return -1;
 }
 
 int digitalSucess(){
-  servo.angulo(80);
-  digitalWrite(10, HIGH);
+  servo.write(80);
+  digitalWrite(pinLedGreen, HIGH);
   delay(1000);
-  digitalWrite(10, LOW);
+  digitalWrite(pinLedGreen, LOW);
   Serial.print("Found ID #"); Serial.print(dedo.fingerID); 
   Serial.print(" with confidence of "); Serial.println(dedo.confidence);
 
