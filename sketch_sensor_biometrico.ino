@@ -55,21 +55,33 @@ void loop() {
 }
 
 
-void threadDigital(){ //Metodo sendo executado na Thread1
+void  threadDigital(){ //Metodo sendo executado na Thread1
 
   //verificaPessoa(); //Método que verifica se a digital esta na memoria e se pertence a um administrador
-  delay(50);
+   delay(50);
   botao_pressionado = digitalRead(botao);
   if(botao_pressionado == HIGH){                        //verifica se o botao foi pressionado
     apresentaMensagem("Aguardando id do Administrador!");
-    Serial.println("Aguardando id do Administrador!"); 
-    botao_pressionado = LOW;                            //delay para nao ficar repetindo a mensagem
-    delay(2000);
-    modoGravacaoID(pessoas);
-  } else {
-    
+      Serial.println("Aguardando id do Administrador!"); 
+      botao_pressionado = LOW; 
+      admin = false;
+      while(admin==false){
+        verificaPessoa();
+        botao_pressionado = digitalRead(botao);
+        Serial.println("."); 
+        if(botao_pressionado == HIGH){ 
+          botao_pressionado = LOW; 
+          break;
+        }
+      }   
+      if(admin==true){
+        
+        modoGravacaoID(pessoas);
+      } else {
+        Serial.println("Não encontrei a digital do administrador!"); 
+        apresentaMensagem("Não encontrei a digital do administrador!");
+    }
   }
-
 }
 
 void apresentaMensagem(String mensagem){
