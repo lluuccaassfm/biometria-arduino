@@ -49,7 +49,7 @@ void setup() {
 }
 
 void loop() {
-
+  servo.write(180);
   if(Thread1.shouldRun()) Thread1.run(); //Verifica se o Thread1 deve ser executado;
   if(ThreadVerificaPessoa.shouldRun()) ThreadVerificaPessoa.run(); 
 }
@@ -66,7 +66,7 @@ void  threadDigital(){ //Metodo sendo executado na Thread1
       botao_pressionado = LOW; 
       admin = false;
       while(admin==false){
-        verificaPessoa();
+        verificaAdministrador();
         botao_pressionado = digitalRead(botao);
         Serial.println("."); 
         if(botao_pressionado == HIGH){ 
@@ -78,8 +78,8 @@ void  threadDigital(){ //Metodo sendo executado na Thread1
         
         modoGravacaoID(pessoas);
       } else {
-        Serial.println("Não encontrei a digital do administrador!"); 
-        apresentaMensagem("Não encontrei a digital do administrador!");
+        Serial.println("Nao encontrei a digital do administrador!"); 
+        apresentaMensagem("Nao encontrei a digital do administrador!");
     }
   }
 }
@@ -101,7 +101,7 @@ void apresentaMensagem(String mensagem){
    x++;
     if(thisChar == mensagem.length()-1){
      lcd.noAutoscroll();
-     delay(500);
+     delay(300);
      lcd.clear();
     }
   }
@@ -130,10 +130,28 @@ int verificaPessoa() {
   if(dedo.fingerID == 0){  // Comparando digital colocada com a digital da memoria, A digital 0 resenvada para o administrador
     apresentaMensagem("Ola, Administrador.");
     Serial.println("Ola Administrador");
-    admin = true; //Esta digital percente ao administrador
+    //admin = true; //Esta digital percente ao administrador
   }
 
    return digitalSucess();  
+}
+int verificaAdministrador() {
+  uint8_t p = dedo.getImage();
+  if (p != FINGERPRINT_OK)  return -1;
+
+  p = dedo.image2Tz();
+  if (p != FINGERPRINT_OK)  return -1;
+
+  p = dedo.fingerFastSearch();
+  if (p != FINGERPRINT_OK){
+    return digitalFailed();
+  }  
+
+  if(dedo.fingerID == 0){  // Comparando digital colocada com a digital da memoria, A digital 0 resenvada para o administrador
+    //apresentaMensagem("Ola, Administrador.");
+    Serial.println("Ola Administrador");
+    admin = true; //Esta digital percente ao administrador
+  }
 }
 
 int digitalFailed(){
@@ -151,7 +169,7 @@ int digitalSucess(){
   delay(4000);
   servo.write(180);
   digitalWrite(pinLedGreen, LOW);
-  apresentaMensagem("Ola, ID " + dedo.fingerID);
+  apresentaMensagem("Seja bem vindo!");
   Serial.print("Found ID #"); Serial.print(dedo.fingerID); 
   Serial.print(" with confidence of "); Serial.println(dedo.confidence);
 
