@@ -1,3 +1,4 @@
+Acesse o arquivo "link_video_explicativo" que contém o link de acesso ao vídeo explicativo do projeto.
 
 ![](/Sensor-biometrico-Sketch_bb.png)
 
