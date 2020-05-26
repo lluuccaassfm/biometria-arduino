@@ -1,5 +1,5 @@
-Acesse o arquivo "link_video_explicativo" que contém o link de acesso ao vídeo explicativo do projeto.
-
+- Acesse o arquivo "link_video_explicativo" que contém o link de acesso ao vídeo explicativo do projeto.
+- Imagem com conexões e recursos utilizados:
 ![](/Sensor-biometrico-Sketch_bb.png)
 
 ## Biblioteca de Thread utilizado neste projeto.
