@@ -25,7 +25,8 @@ void setup() {
 	servo.attach(6);			  //porta de dados do sservo motor
 	pinMode(pinLedGreen, OUTPUT); //led verde
 	pinMode(pinLedRed, OUTPUT);	  //led vermelho
-
+	servo.write(180);
+	
 	Serial.begin(9600);
 	dedo.begin(57600);
 
@@ -48,7 +49,6 @@ void setup() {
 }
 
 void loop() {
-	servo.write(180);
 	if (Thread1.shouldRun())
 		Thread1.run(); //Verifica se o Thread1 deve ser executado;
 	if (ThreadVerificaPessoa.shouldRun())
